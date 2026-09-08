@@ -1,0 +1,18 @@
+Test the connection step by step. Your MongoDB is running inside K3s, and you want to connect to it from Windows MongoDB Compass/Admin UI
+
+MongoDB Pod
+    ↓
+mongodb-service : 27017
+    ↓
+NodePort : 30001
+    ↓
+Ubuntu/K3s node IP : ipaddress
+
+the external connection should be: mongodb://admin:PASSWORD@<ipaddress>:<portnumber>/?authSource=admin&directConnection=true
+
+Confirm MongoDB pod is running: k3s kubectl get all -n <namespace>
+
+Test the NodePort: you will get   [nc -vz ipaddr nodeport] get success message
+
+
+
