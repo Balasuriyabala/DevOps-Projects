@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1>Log in</h1>
+    <div class="error" id="error"></div>
+    <input id="username" placeholder="Username" autocomplete="username">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+    <button onclick="login()">Log in</button>
+    <div class="link"><a href="register.html">Need an account? Register</a></div>
+  </div>
+
+<script>
+// Every frontend call goes to the gateway, never straight to a service.
+// Uses whatever host the page was loaded from (localhost, a LAN IP, etc.)
+// instead of hardcoding "localhost", which only works when the browser
+// and the containers are on the same machine.
+const API_BASE = `http://${window.location.hostname}:5050`;
+
+async function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errorEl = document.getElementById('error');
+  errorEl.textContent = '';
+
+  if (!username || !password) {
+    errorEl.textContent = 'Enter a username and password.';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorEl.textContent = data.error || 'Login failed';
+      return;
+    }
+    // The JWT is the only thing proving who you are from here on.
+    // It gets attached as an Authorization header on future requests.
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('username', data.username);
+    window.location.href = 'dashboard.html';
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server.';
+  }
+}
+</script>
+</body>
+</html>
