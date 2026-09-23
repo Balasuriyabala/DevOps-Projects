@@ -1,4 +1,4 @@
-# This is Kubernetes based project 
+# This is Kubernetes based project Monolithick application
 
 CI - setup done by github action
 
