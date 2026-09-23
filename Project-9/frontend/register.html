@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Register</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h1>Create an account</h1>
+    <div class="error" id="error"></div>
+    <input id="username" placeholder="Username" autocomplete="username">
+    <input id="password" type="password" placeholder="Password" autocomplete="new-password">
+    <button onclick="register()">Register</button>
+    <div class="link"><a href="index.html">Already have an account? Log in</a></div>
+  </div>
+
+<script>
+// Uses whatever host the page was loaded from (localhost, a LAN IP, etc.)
+// instead of hardcoding "localhost", which only works when the browser
+// and the containers are on the same machine.
+const API_BASE = `http://${window.location.hostname}:5000`;
+
+async function register() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errorEl = document.getElementById('error');
+  errorEl.textContent = '';
+
+  if (!username || !password) {
+    errorEl.textContent = 'Enter a username and password.';
+    return;
+  }
+
+  try {
+    // This single call triggers auth-service to create credentials AND
+    // (internally, server-side) call user-service to create a profile.
+    // The browser never talks to user-service directly for this step.
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorEl.textContent = data.error || 'Registration failed';
+      return;
+    }
+    window.location.href = 'index.html';
+  } catch (err) {
+    errorEl.textContent = 'Could not reach the server.';
+  }
+}
+</script>
+</body>
+</html>
